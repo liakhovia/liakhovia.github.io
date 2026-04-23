@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>LensCraft — Профессиональная съёмка</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
   <style>
-    body { font-family: 'Inter', system-ui, sans-serif; }
+    body { font-family: 'Inter', system-ui, sans-serif; background-color: #f8f9fa; }
     .hero-bg {
       background-image: url('https://images.squarespace-cdn.com/content/v1/68add0f1872ce14894bb8870/8a2b1644-9def-49c6-b78e-7996735f576a/Montagne+2.jpg?format=2500w');
       background-size: cover;
@@ -21,7 +23,8 @@
       transform: translateY(-6px);
       box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.25);
     }
-    .modal-overlay {
+    /* Кастомное модальное окно (сохраняем для деталей фото) */
+    .custom-modal {
       position: fixed;
       top: 0;
       left: 0;
@@ -32,16 +35,16 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 1000;
+      z-index: 1050;
       opacity: 0;
       visibility: hidden;
       transition: all 0.3s ease;
     }
-    .modal-overlay.active {
+    .custom-modal.active {
       opacity: 1;
       visibility: visible;
     }
-    .modal-content {
+    .custom-modal-content {
       max-width: 90vw;
       max-height: 90vh;
       background: #0f172a;
@@ -54,14 +57,14 @@
       position: relative;
       box-shadow: 0 30px 40px rgba(0,0,0,0.5);
     }
-    .modal-img {
+    .custom-modal-img {
       max-width: 85vw;
       max-height: 60vh;
       object-fit: contain;
       border-radius: 1.5rem;
       border: 2px solid rgba(255,255,255,0.2);
     }
-    .modal-details {
+    .custom-modal-details {
       background: rgba(255,255,255,0.1);
       backdrop-filter: blur(10px);
       margin-top: 1.2rem;
@@ -71,7 +74,7 @@
       color: white;
       text-align: center;
     }
-    .close-modal {
+    .close-custom-modal {
       position: absolute;
       top: 1rem;
       right: 1.5rem;
@@ -83,157 +86,171 @@
       transition: 0.2s;
       z-index: 10;
     }
-    .close-modal:hover {
+    .close-custom-modal:hover {
       color: #ef4444;
       transform: scale(1.1);
     }
-    #searchInput {
-      transition: all 0.2s;
-    }
-    #searchInput:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    /* чтобы модалка не конфликтовала с bootstrap */
+    body.modal-open {
+      overflow: hidden;
     }
   </style>
 </head>
-<body class="bg-gray-50">
+<body>
 
-  <!-- Navbar -->
-  <nav class="bg-white shadow-md sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <i class="fa-solid fa-camera text-4xl text-black"></i>
-        <h1 class="text-3xl font-bold">LensCraft</h1>
-      </div>
-      <div class="flex gap-2 flex-wrap justify-end">
-        <button onclick="navigate('main')" class="nav-btn px-5 py-3 rounded-xl font-medium hover:bg-blue-600 hover:text-white transition">Главная</button>
-        <button onclick="navigate('services')" class="nav-btn px-5 py-3 rounded-xl font-medium hover:bg-blue-600 hover:text-white transition">Услуги</button>
-        <button onclick="navigate('portfolio')" class="nav-btn px-5 py-3 rounded-xl font-medium hover:bg-blue-600 hover:text-white transition">Портфолио</button>
-        <button onclick="navigate('booking')" class="nav-btn px-5 py-3 rounded-xl font-medium hover:bg-blue-600 hover:text-white transition">Заказать съёмку</button>
+  <!-- Navbar (Bootstrap) -->
+  <nav class="navbar navbar-expand-lg bg-white shadow-sm sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+        <i class="fa-solid fa-camera fs-1 text-dark"></i>
+        <span class="fs-3 fw-bold">LensCraft</span>
+      </a>
+      <div class="d-flex gap-2">
+        <button onclick="navigate('main')" class="btn btn-outline-primary rounded-pill px-4">Главная</button>
+        <button onclick="navigate('services')" class="btn btn-outline-primary rounded-pill px-4">Услуги</button>
+        <button onclick="navigate('portfolio')" class="btn btn-outline-primary rounded-pill px-4">Портфолио</button>
+        <button onclick="navigate('booking')" class="btn btn-outline-primary rounded-pill px-4">Заказать съёмку</button>
       </div>
     </div>
   </nav>
 
   <!-- ГЛАВНАЯ СТРАНИЦА -->
-  <section id="main" class="hero-bg min-h-screen text-white flex items-center">
-    <div class="max-w-7xl mx-auto px-6 py-24">
-      <div class="max-w-xl">
-        <h2 class="text-6xl font-bold leading-tight mb-6">Запечатлей свой момент</h2>
-        <p class="text-2xl mb-10">Профессиональная съёмка, которая живёт в кадрах</p>
-        <div class="flex gap-4 flex-wrap">
-          <button onclick="navigate('booking')" 
-                  class="bg-green-600 hover:bg-green-700 px-8 py-4 rounded-2xl text-xl font-medium transition shadow-lg">
-            Заказать съёмку
-          </button>
-          <button onclick="navigate('portfolio')" 
-                  class="bg-white text-black hover:bg-gray-100 px-8 py-4 rounded-2xl text-xl font-medium transition shadow-lg">
-            Посмотреть портфолио
-          </button>
+  <section id="main" class="hero-bg min-vh-100 d-flex align-items-center text-white">
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-lg-6">
+          <h1 class="display-1 fw-bold mb-4">Запечатлей свой момент</h1>
+          <p class="fs-2 mb-4">Профессиональная съёмка, которая живёт в кадрах</p>
+          <div class="d-flex gap-3 flex-wrap">
+            <button onclick="navigate('booking')" class="btn btn-success btn-lg rounded-pill px-5 py-3 shadow">
+              Заказать съёмку
+            </button>
+            <button onclick="navigate('portfolio')" class="btn btn-light btn-lg rounded-pill px-5 py-3 shadow text-dark">
+              Посмотреть портфолио
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- УСЛУГИ -->
-  <section id="services" class="hidden max-w-7xl mx-auto px-6 py-16">
-    <div class="text-center mb-12">
-      <h2 class="text-5xl font-bold text-gray-800 mb-4">Наши услуги</h2>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto">Выберите формат съёмки, который идеально подходит вам</p>
+  <!-- УСЛУГИ (карточки Bootstrap) -->
+  <section id="services" class="container py-5 d-none">
+    <div class="text-center mb-5">
+      <h2 class="display-4 fw-bold text-dark">Наши услуги</h2>
+      <p class="fs-4 text-secondary">Выберите формат съёмки, который идеально подходит вам</p>
     </div>
-    <div class="grid md:grid-cols-3 gap-8">
-      <div class="bg-white rounded-3xl shadow-xl overflow-hidden hover:scale-[1.02] transition transform duration-300">
-        <div class="h-56 bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center">
-          <i class="fa-solid fa-ring text-6xl text-white"></i>
-        </div>
-        <div class="p-6">
-          <h3 class="text-2xl font-bold mb-2">Love Story & Свадьба</h3>
-          <p class="text-gray-600 mb-4">Романтичные прогулки, эмоции и искренние кадры вашей любви.</p>
-          <span class="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm">от 25 000 ₽</span>
-        </div>
-      </div>
-      <div class="bg-white rounded-3xl shadow-xl overflow-hidden hover:scale-[1.02] transition transform duration-300">
-        <div class="h-56 bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
-          <i class="fa-solid fa-camera-retro text-6xl text-white"></i>
-        </div>
-        <div class="p-6">
-          <h3 class="text-2xl font-bold mb-2">Портрет & Стиль</h3>
-          <p class="text-gray-600 mb-4">Индивидуальные сессии, подчеркивающие вашу уникальность.</p>
-          <span class="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm">от 12 000 ₽</span>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100 shadow border-0 rounded-4 overflow-hidden hover-scale">
+          <div class="card-body text-center py-5 bg-gradient-amber">
+            <i class="fa-solid fa-ring text-white fs-1"></i>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title fs-2 fw-bold">Love Story & Свадьба</h3>
+            <p class="card-text text-secondary">Романтичные прогулки, эмоции и искренние кадры вашей любви.</p>
+            <span class="badge bg-secondary rounded-pill px-3 py-2">от 25 000 ₽</span>
+          </div>
         </div>
       </div>
-      <div class="bg-white rounded-3xl shadow-xl overflow-hidden hover:scale-[1.02] transition transform duration-300">
-        <div class="h-56 bg-gradient-to-r from-emerald-500 to-teal-600 flex items-center justify-center">
-          <i class="fa-solid fa-building text-6xl text-white"></i>
+      <div class="col-md-4">
+        <div class="card h-100 shadow border-0 rounded-4 overflow-hidden">
+          <div class="card-body text-center py-5 bg-gradient-blue">
+            <i class="fa-solid fa-camera-retro text-white fs-1"></i>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title fs-2 fw-bold">Портрет & Стиль</h3>
+            <p class="card-text text-secondary">Индивидуальные сессии, подчеркивающие вашу уникальность.</p>
+            <span class="badge bg-secondary rounded-pill px-3 py-2">от 12 000 ₽</span>
+          </div>
         </div>
-        <div class="p-6">
-          <h3 class="text-2xl font-bold mb-2">Интерьер & Архитектура</h3>
-          <p class="text-gray-600 mb-4">Презентабельные кадры для бизнеса, отелей, ресторанов.</p>
-          <span class="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm">от 35 000 ₽</span>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 shadow border-0 rounded-4 overflow-hidden">
+          <div class="card-body text-center py-5 bg-gradient-emerald">
+            <i class="fa-solid fa-building text-white fs-1"></i>
+          </div>
+          <div class="card-body">
+            <h3 class="card-title fs-2 fw-bold">Интерьер & Архитектура</h3>
+            <p class="card-text text-secondary">Презентабельные кадры для бизнеса, отелей, ресторанов.</p>
+            <span class="badge bg-secondary rounded-pill px-3 py-2">от 35 000 ₽</span>
+          </div>
         </div>
       </div>
     </div>
-    <div class="mt-12 text-center text-gray-500 border-t pt-8 italic">
-      <i class="fa-regular fa-clock"></i> Точную стоимость и детали уточняйте при заказе съёмки
+    <div class="text-center text-secondary mt-5 pt-3 border-top">
+      <i class="fa-regular fa-clock me-2"></i>Точную стоимость и детали уточняйте при заказе съёмки
     </div>
   </section>
 
   <!-- ПОРТФОЛИО с галереей и поиском -->
-  <section id="portfolio" class="hidden max-w-7xl mx-auto px-6 py-16">
-    <div class="text-center mb-12">
-      <h2 class="text-5xl font-bold text-gray-800 mb-4">Портфолио</h2>
-      <p class="text-xl text-gray-600 max-w-2xl mx-auto">Нажмите на любую фотографию — узнайте детали съёмки</p>
+  <section id="portfolio" class="container py-5 d-none">
+    <div class="text-center mb-5">
+      <h2 class="display-4 fw-bold text-dark">Портфолио</h2>
+      <p class="fs-4 text-secondary">Нажмите на любую фотографию — узнайте детали съёмки</p>
     </div>
-    <div class="mb-10 max-w-md mx-auto">
-      <div class="relative">
-        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-        <input type="text" id="searchInput" placeholder="Поиск по имени фотографа или дате..." 
-               class="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:border-blue-500 text-lg">
+    <div class="row justify-content-center mb-4">
+      <div class="col-md-6">
+        <div class="input-group">
+          <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass"></i></span>
+          <input type="text" id="searchInput" class="form-control form-control-lg" placeholder="Поиск по имени фотографа или дате...">
+        </div>
+        <p class="text-muted text-center mt-2 small" id="searchResultsCount"></p>
       </div>
-      <p class="text-sm text-gray-500 mt-2 text-center" id="searchResultsCount"></p>
     </div>
-    <div id="galleryContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    <div id="galleryContainer" class="row g-4">
+      <!-- галерея заполнится скриптом -->
+    </div>
   </section>
 
   <!-- СТРАНИЦА ЗАКАЗА СЪЁМКИ -->
-  <section id="booking" class="hidden max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-2 gap-12 items-center">
-    <div>
-      <img src="https://i.pinimg.com/originals/51/7d/c7/517dc74ecb60eaa708757134f4a62540.jpg" 
-           class="rounded-3xl shadow-2xl" alt="Фотограф">
-    </div>
-    <div class="bg-white rounded-3xl shadow-xl p-10">
-      <h2 class="text-4xl font-bold mb-8">Заказать съёмку</h2>
-      <form onsubmit="submitForm(event)" class="space-y-6">
-        <input type="text" id="clientName" placeholder="Ваше имя" required class="w-full px-6 py-4 border rounded-2xl focus:outline-none focus:border-blue-500">
-        <input type="email" id="clientEmail" placeholder="Электронная почта" required class="w-full px-6 py-4 border rounded-2xl focus:outline-none focus:border-blue-500">
-        <textarea id="clientMessage" placeholder="Опишите ваши пожелания для съёмки (дата, локация, идеи)..." rows="5"
-                  class="w-full px-6 py-4 border rounded-2xl focus:outline-none focus:border-blue-500"></textarea>
-        <button type="submit" 
-                class="w-full bg-green-600 hover:bg-green-700 py-5 rounded-2xl text-xl font-medium text-white transition">
-          Отправить заявку
-        </button>
-      </form>
+  <section id="booking" class="container py-5 d-none">
+    <div class="row g-5 align-items-center">
+      <div class="col-md-6">
+        <img src="https://i.pinimg.com/originals/51/7d/c7/517dc74ecb60eaa708757134f4a62540.jpg" 
+             class="img-fluid rounded-4 shadow" alt="Фотограф">
+      </div>
+      <div class="col-md-6">
+        <div class="card shadow-lg border-0 rounded-4 p-4">
+          <h2 class="display-5 fw-bold mb-4">Заказать съёмку</h2>
+          <form onsubmit="submitForm(event)">
+            <div class="mb-3">
+              <input type="text" id="clientName" class="form-control form-control-lg" placeholder="Ваше имя" required>
+            </div>
+            <div class="mb-3">
+              <input type="email" id="clientEmail" class="form-control form-control-lg" placeholder="Электронная почта" required>
+            </div>
+            <div class="mb-4">
+              <textarea id="clientMessage" class="form-control form-control-lg" rows="5" placeholder="Опишите ваши пожелания для съёмки (дата, локация, идеи)..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-success btn-lg w-100 rounded-pill py-3">Отправить заявку</button>
+          </form>
+        </div>
+      </div>
     </div>
   </section>
 
-  <footer class="bg-gray-900 text-white py-12 text-center">
-    <p class="text-2xl font-bold">LensCraft © 2026</p>
-    <p class="mt-2">Профессиональная фотосъёмка — вдохновение в каждом кадре</p>
+  <footer class="bg-dark text-white py-5 text-center">
+    <p class="fs-2 fw-bold mb-2">LensCraft © 2026</p>
+    <p class="mb-0">Профессиональная фотосъёмка — вдохновение в каждом кадре</p>
   </footer>
 
-  <!-- Модальное окно для фото -->
-  <div id="photoModal" class="modal-overlay">
-    <div class="modal-content">
-      <button class="close-modal" onclick="closeModal()">&times;</button>
-      <img id="modalImg" class="modal-img" src="" alt="Детальный просмотр">
-      <div class="modal-details">
-        <p id="modalDate" class="text-lg font-semibold"><i class="fa-regular fa-calendar-alt mr-2"></i> Дата съёмки: —</p>
-        <p id="modalPhotographer" class="text-lg mt-2"><i class="fa-regular fa-user mr-2"></i> Фотограф: —</p>
-        <p id="modalEmail" class="text-md mt-1 opacity-90"><i class="fa-regular fa-envelope mr-2"></i> Email: —</p>
+  <!-- Кастомное модальное окно для деталей фото -->
+  <div id="photoModal" class="custom-modal">
+    <div class="custom-modal-content">
+      <button class="close-custom-modal" onclick="closeModal()">&times;</button>
+      <img id="modalImg" class="custom-modal-img" src="" alt="Детальный просмотр">
+      <div class="custom-modal-details">
+        <p id="modalDate" class="fs-5 fw-semibold"><i class="fa-regular fa-calendar-alt me-2"></i> Дата съёмки: —</p>
+        <p id="modalPhotographer" class="fs-5 mt-2"><i class="fa-regular fa-user me-2"></i> Фотограф: —</p>
+        <p id="modalEmail" class="mt-1 opacity-75"><i class="fa-regular fa-envelope me-2"></i> Email: —</p>
       </div>
     </div>
   </div>
 
-  <!-- Подключаем внешний скрипт -->
+  <!-- Bootstrap JS (для некоторых компонентов, но не обязателен) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Основной скрипт -->
   <script src="script.js"></script>
 </body>
 </html>
