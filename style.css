@@ -1,0 +1,118 @@
+/* Пользовательские стили для сайта LensCraft */
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: #f8f9fa;
+}
+
+/* Hero background */
+.hero-bg {
+  background-image: url('https://images.squarespace-cdn.com/content/v1/68add0f1872ce14894bb8870/8a2b1644-9def-49c6-b78e-7996735f576a/Montagne+2.jpg?format=2500w');
+  background-size: cover;
+  background-position: center;
+}
+
+/* Карточка галереи (анимация при наведении) */
+.gallery-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+.gallery-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Градиенты для фона карточек услуг */
+.bg-gradient-amber {
+  background: linear-gradient(135deg, #f59e0b, #ea580c);
+}
+.bg-gradient-blue {
+  background: linear-gradient(135deg, #3b82f6, #4f46e5);
+}
+.bg-gradient-emerald {
+  background: linear-gradient(135deg, #10b981, #0d9488);
+}
+
+/* Кастомное модальное окно (поверх Bootstrap) */
+.custom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+.custom-modal.active {
+  opacity: 1;
+  visibility: visible;
+}
+.custom-modal-content {
+  max-width: 90vw;
+  max-height: 90vh;
+  background: #0f172a;
+  border-radius: 2rem;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem;
+  position: relative;
+  box-shadow: 0 30px 40px rgba(0, 0, 0, 0.5);
+}
+.custom-modal-img {
+  max-width: 85vw;
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: 1.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+.custom-modal-details {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  margin-top: 1.2rem;
+  padding: 1rem 2rem;
+  border-radius: 2rem;
+  width: 100%;
+  color: white;
+  text-align: center;
+}
+.close-custom-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  font-size: 2.2rem;
+  background: none;
+  border: none;
+  color: #f1f5f9;
+  cursor: pointer;
+  transition: 0.2s;
+  z-index: 10;
+}
+.close-custom-modal:hover {
+  color: #ef4444;
+  transform: scale(1.1);
+}
+
+/* Вспомогательный класс, когда модалка открыта */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Адаптивность для карточек галереи (дополнительно) */
+@media (max-width: 768px) {
+  .custom-modal-content {
+    padding: 1rem;
+  }
+  .custom-modal-img {
+    max-width: 90vw;
+    max-height: 50vh;
+  }
+}
