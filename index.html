@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ru" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LensCraft — Профессиональная съёмка</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .hero-bg {
+      background-image: url('https://images.squarespace-cdn.com/content/v1/68add0f1872ce14894bb8870/8a2b1644-9def-49c6-b78e-7996735f576a/Montagne+2.jpg?format=2500w');
+      background-size: cover;
+      background-position: center;
+    }
+    .gallery-card {
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      cursor: pointer;
+    }
+    .gallery-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 25px -12px rgba(0, 0, 0, 0.25);
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-content {
+      max-width: 90vw;
+      max-height: 90vh;
+      background: #0f172a;
+      border-radius: 2rem;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem;
+      position: relative;
+      box-shadow: 0 30px 40px rgba(0,0,0,0.5);
+    }
+    .modal-img {
+      max-width: 85vw;
+      max-height: 60vh;
+      object-fit: contain;
+      border-radius: 1.5rem;
+      border: 2px solid rgba(255,255,255,0.2);
+    }
+    .modal-details {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      margin-top: 1.2rem;
+      padding: 1rem 2rem;
+      border-radius: 2rem;
+      width: 100%;
+      color: white;
+      text-align: center;
+    }
+    .close-modal {
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      font-size: 2.2rem;
+      background: none;
+      border: none;
+      color: #f1f5f9;
+      cursor: pointer;
+      transition: 0.2s;
+      z-index: 10;
+    }
+    .close-modal:hover {
+      color: #ef4444;
+      transform: scale(1.1);
+    }
+    #searchInput {
+      transition: all 0.2s;
+    }
+    #searchInput:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+
+  <!-- Navbar -->
+  <nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <i class="fa-solid fa-camera text-4xl text-black"></i>
+        <h1 class="text-3xl font-bold">LensCraft</h1>
+      </div>
+      <div class="flex gap-2 flex-wrap justify-end">
+        <button onclick="navigate('main')" class="nav-btn px-5 py-3 rounded-xl font-medium hover:bg-blue-600 hover:text-white transition">Главная</button>
+        <button onclick="navigate('services')" class="nav-btn px-5 py-3 rounded-xl font-medium hover:bg-blue-600 hover:text-white transition">Услуги</button>
+        <button onclick="navigate('portfolio')" class="nav-btn px-5 py-3 rounded-xl font-medium hover:bg-blue-600 hover:text-white transition">Портфолио</button>
+        <button onclick="navigate('booking')" class="nav-btn px-5 py-3 rounded-xl font-medium hover:bg-blue-600 hover:text-white transition">Заказать съёмку</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ГЛАВНАЯ СТРАНИЦА -->
+  <section id="main" class="hero-bg min-h-screen text-white flex items-center">
+    <div class="max-w-7xl mx-auto px-6 py-24">
+      <div class="max-w-xl">
+        <h2 class="text-6xl font-bold leading-tight mb-6">Запечатлей свой момент</h2>
+        <p class="text-2xl mb-10">Профессиональная съёмка, которая живёт в кадрах</p>
+        <div class="flex gap-4 flex-wrap">
+          <button onclick="navigate('booking')" 
+                  class="bg-green-600 hover:bg-green-700 px-8 py-4 rounded-2xl text-xl font-medium transition shadow-lg">
+            Заказать съёмку
+          </button>
+          <button onclick="navigate('portfolio')" 
+                  class="bg-white text-black hover:bg-gray-100 px-8 py-4 rounded-2xl text-xl font-medium transition shadow-lg">
+            Посмотреть портфолио
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- УСЛУГИ -->
+  <section id="services" class="hidden max-w-7xl mx-auto px-6 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-5xl font-bold text-gray-800 mb-4">Наши услуги</h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">Выберите формат съёмки, который идеально подходит вам</p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="bg-white rounded-3xl shadow-xl overflow-hidden hover:scale-[1.02] transition transform duration-300">
+        <div class="h-56 bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center">
+          <i class="fa-solid fa-ring text-6xl text-white"></i>
+        </div>
+        <div class="p-6">
+          <h3 class="text-2xl font-bold mb-2">Love Story & Свадьба</h3>
+          <p class="text-gray-600 mb-4">Романтичные прогулки, эмоции и искренние кадры вашей любви.</p>
+          <span class="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm">от 25 000 ₽</span>
+        </div>
+      </div>
+      <div class="bg-white rounded-3xl shadow-xl overflow-hidden hover:scale-[1.02] transition transform duration-300">
+        <div class="h-56 bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center">
+          <i class="fa-solid fa-camera-retro text-6xl text-white"></i>
+        </div>
+        <div class="p-6">
+          <h3 class="text-2xl font-bold mb-2">Портрет & Стиль</h3>
+          <p class="text-gray-600 mb-4">Индивидуальные сессии, подчеркивающие вашу уникальность.</p>
+          <span class="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm">от 12 000 ₽</span>
+        </div>
+      </div>
+      <div class="bg-white rounded-3xl shadow-xl overflow-hidden hover:scale-[1.02] transition transform duration-300">
+        <div class="h-56 bg-gradient-to-r from-emerald-500 to-teal-600 flex items-center justify-center">
+          <i class="fa-solid fa-building text-6xl text-white"></i>
+        </div>
+        <div class="p-6">
+          <h3 class="text-2xl font-bold mb-2">Интерьер & Архитектура</h3>
+          <p class="text-gray-600 mb-4">Презентабельные кадры для бизнеса, отелей, ресторанов.</p>
+          <span class="inline-block bg-gray-100 text-gray-800 px-4 py-2 rounded-full text-sm">от 35 000 ₽</span>
+        </div>
+      </div>
+    </div>
+    <div class="mt-12 text-center text-gray-500 border-t pt-8 italic">
+      <i class="fa-regular fa-clock"></i> Точную стоимость и детали уточняйте при заказе съёмки
+    </div>
+  </section>
+
+  <!-- ПОРТФОЛИО с галереей и поиском -->
+  <section id="portfolio" class="hidden max-w-7xl mx-auto px-6 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-5xl font-bold text-gray-800 mb-4">Портфолио</h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">Нажмите на любую фотографию — узнайте детали съёмки</p>
+    </div>
+    <div class="mb-10 max-w-md mx-auto">
+      <div class="relative">
+        <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <input type="text" id="searchInput" placeholder="Поиск по имени фотографа или дате..." 
+               class="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-2xl shadow-sm focus:outline-none focus:border-blue-500 text-lg">
+      </div>
+      <p class="text-sm text-gray-500 mt-2 text-center" id="searchResultsCount"></p>
+    </div>
+    <div id="galleryContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+  </section>
+
+  <!-- СТРАНИЦА ЗАКАЗА СЪЁМКИ -->
+  <section id="booking" class="hidden max-w-7xl mx-auto px-6 py-12 grid md:grid-cols-2 gap-12 items-center">
+    <div>
+      <img src="https://i.pinimg.com/originals/51/7d/c7/517dc74ecb60eaa708757134f4a62540.jpg" 
+           class="rounded-3xl shadow-2xl" alt="Фотограф">
+    </div>
+    <div class="bg-white rounded-3xl shadow-xl p-10">
+      <h2 class="text-4xl font-bold mb-8">Заказать съёмку</h2>
+      <form onsubmit="submitForm(event)" class="space-y-6">
+        <input type="text" id="clientName" placeholder="Ваше имя" required class="w-full px-6 py-4 border rounded-2xl focus:outline-none focus:border-blue-500">
+        <input type="email" id="clientEmail" placeholder="Электронная почта" required class="w-full px-6 py-4 border rounded-2xl focus:outline-none focus:border-blue-500">
+        <textarea id="clientMessage" placeholder="Опишите ваши пожелания для съёмки (дата, локация, идеи)..." rows="5"
+                  class="w-full px-6 py-4 border rounded-2xl focus:outline-none focus:border-blue-500"></textarea>
+        <button type="submit" 
+                class="w-full bg-green-600 hover:bg-green-700 py-5 rounded-2xl text-xl font-medium text-white transition">
+          Отправить заявку
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <footer class="bg-gray-900 text-white py-12 text-center">
+    <p class="text-2xl font-bold">LensCraft © 2026</p>
+    <p class="mt-2">Профессиональная фотосъёмка — вдохновение в каждом кадре</p>
+  </footer>
+
+  <!-- Модальное окно для фото -->
+  <div id="photoModal" class="modal-overlay">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal()">&times;</button>
+      <img id="modalImg" class="modal-img" src="" alt="Детальный просмотр">
+      <div class="modal-details">
+        <p id="modalDate" class="text-lg font-semibold"><i class="fa-regular fa-calendar-alt mr-2"></i> Дата съёмки: —</p>
+        <p id="modalPhotographer" class="text-lg mt-2"><i class="fa-regular fa-user mr-2"></i> Фотограф: —</p>
+        <p id="modalEmail" class="text-md mt-1 opacity-90"><i class="fa-regular fa-envelope mr-2"></i> Email: —</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Подключаем внешний скрипт -->
+  <script src="script.js"></script>
+</body>
+</html>
