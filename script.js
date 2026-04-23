@@ -46,6 +46,55 @@ const galleryItems = [
 
 let currentFilter = '';
 
+// Элементы модального окна
+let successModal, errorModal;
+
+function initModals() {
+  // Создаём модальные окна
+  if (!document.getElementById('successModal')) {
+    const successModalHtml = `
+      <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+              <h5 class="modal-title">Успешно!</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              Ваша заявка успешно отправлена. Мы свяжемся с вами в ближайшее время.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-success" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    const errorModalHtml = `
+      <div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title">Ошибка валидации</h5>
+              <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              Пожалуйста, заполните все обязательные поля (имя и email).
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Понятно</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', successModalHtml);
+    document.body.insertAdjacentHTML('beforeend', errorModalHtml);
+  }
+  successModal = new bootstrap.Modal(document.getElementById('successModal'));
+  errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+}
+
 function renderGalleryWithFilter() {
   const container = document.getElementById('galleryContainer');
   if (!container) return;
@@ -62,7 +111,7 @@ function renderGalleryWithFilter() {
   const countElement = document.getElementById('searchResultsCount');
   if (countElement) {
     if (filteredItems.length === 0) {
-      countElement.innerHTML = '😕 Ничего не найдено';
+      countElement.innerHTML = 'Ничего не найдено';
       countElement.classList.add('text-danger');
     } else {
       countElement.innerHTML = `Найдено ${filteredItems.length} из ${galleryItems.length} фотографий`;
@@ -122,15 +171,40 @@ function submitForm(e) {
   e.preventDefault();
   const name = document.getElementById('clientName')?.value.trim();
   const email = document.getElementById('clientEmail')?.value.trim();
+  const message = document.getElementById('clientMessage')?.value.trim();
+
+  // Вывод данных формы в консоль
+  console.log('=== Данные формы ===');
+  console.log('Имя:', name);
+  console.log('Email:', email);
+  console.log('Сообщение:', message || '(не заполнено)');
+  console.log('===================');
+
   if (!name || !email) {
-    alert('Пожалуйста, заполните имя и email');
+    // Показываем модальное окно с ошибкой
+    if (errorModal) errorModal.show();
     return;
   }
-  alert(`Спасибо, ${name}! Ваша заявка принята. Мы свяжемся с вами по адресу ${email} в ближайшее время.`);
-  document.getElementById('clientName').value = '';
-  document.getElementById('clientEmail').value = '';
-  document.getElementById('clientMessage').value = '';
-  navigate('main');
+
+  // Если всё ок — показываем успешное модальное окно
+  if (successModal) {
+    successModal.show();
+    // После закрытия модалки очищаем форму и переходим на главную
+    const modalElement = document.getElementById('successModal');
+    modalElement.addEventListener('hidden.bs.modal', () => {
+      document.getElementById('clientName').value = '';
+      document.getElementById('clientEmail').value = '';
+      document.getElementById('clientMessage').value = '';
+      navigate('main');
+    }, { once: true });
+  } else {
+    // fallback (если модалки не инициализировались)
+    alert('Форма отправлена');
+    document.getElementById('clientName').value = '';
+    document.getElementById('clientEmail').value = '';
+    document.getElementById('clientMessage').value = '';
+    navigate('main');
+  }
 }
 
 function handleSearchInput(e) {
@@ -139,6 +213,7 @@ function handleSearchInput(e) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  initModals();          // создаём модальные окна Bootstrap
   renderGalleryWithFilter();
   const searchInput = document.getElementById('searchInput');
   if (searchInput) searchInput.addEventListener('input', handleSearchInput);
