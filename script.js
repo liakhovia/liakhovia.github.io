@@ -1,4 +1,4 @@
-// Данные галереи (все фото и метаданные)
+// Данные галереи
 const galleryItems = [
   {
     imgUrl: "https://avatars.mds.yandex.net/i?id=b476c03c8504ae3b4d3bab7d47993abf_l-5235887-images-thumbs&n=13",
@@ -46,14 +46,12 @@ const galleryItems = [
 
 let currentFilter = '';
 
-// Рендер галереи с фильтрацией
 function renderGalleryWithFilter() {
   const container = document.getElementById('galleryContainer');
   if (!container) return;
 
   const lowerFilter = currentFilter.toLowerCase().trim();
   let filteredItems = galleryItems;
-
   if (lowerFilter !== '') {
     filteredItems = galleryItems.filter(item =>
       item.photographer.toLowerCase().includes(lowerFilter) ||
@@ -65,32 +63,31 @@ function renderGalleryWithFilter() {
   if (countElement) {
     if (filteredItems.length === 0) {
       countElement.innerHTML = '😕 Ничего не найдено';
-      countElement.classList.add('text-red-500');
-      countElement.classList.remove('text-gray-500');
+      countElement.classList.add('text-danger');
     } else {
       countElement.innerHTML = `Найдено ${filteredItems.length} из ${galleryItems.length} фотографий`;
-      countElement.classList.remove('text-red-500');
-      countElement.classList.add('text-gray-500');
+      countElement.classList.remove('text-danger');
     }
   }
 
   container.innerHTML = '';
   filteredItems.forEach((item, idx) => {
-    const card = document.createElement('div');
-    card.className = 'gallery-card bg-white rounded-2xl overflow-hidden shadow-lg';
-    card.innerHTML = `
-      <img src="${item.thumbnail}" alt="Фото ${idx + 1}" class="w-full h-64 object-cover">
-      <div class="p-4 text-center">
-        <p class="text-gray-500 text-sm"><i class="fa-regular fa-calendar"></i> ${item.date}</p>
-        <p class="font-medium text-gray-800 mt-1">${item.photographer}</p>
+    const col = document.createElement('div');
+    col.className = 'col-md-6 col-lg-4';
+    col.innerHTML = `
+      <div class="card h-100 border-0 shadow-sm gallery-card rounded-4 overflow-hidden">
+        <img src="${item.thumbnail}" class="card-img-top" style="height: 260px; object-fit: cover;" alt="Фото ${idx+1}">
+        <div class="card-body text-center">
+          <p class="text-muted small mb-1"><i class="fa-regular fa-calendar"></i> ${item.date}</p>
+          <p class="fw-semibold mb-0">${item.photographer}</p>
+        </div>
       </div>
     `;
-    card.addEventListener('click', () => openModal(item));
-    container.appendChild(card);
+    col.querySelector('.gallery-card').addEventListener('click', () => openModal(item));
+    container.appendChild(col);
   });
 }
 
-// Открытие модального окна
 function openModal(photoData) {
   const modal = document.getElementById('photoModal');
   const modalImg = document.getElementById('modalImg');
@@ -99,35 +96,32 @@ function openModal(photoData) {
   const modalEmail = document.getElementById('modalEmail');
 
   modalImg.src = photoData.imgUrl;
-  modalDate.innerHTML = `<i class="fa-regular fa-calendar-alt mr-2"></i> Дата съёмки: ${photoData.date}`;
-  modalPhotographer.innerHTML = `<i class="fa-regular fa-user mr-2"></i> Фотограф: ${photoData.photographer}`;
-  modalEmail.innerHTML = `<i class="fa-regular fa-envelope mr-2"></i> Email: ${photoData.email}`;
+  modalDate.innerHTML = `<i class="fa-regular fa-calendar-alt me-2"></i> Дата съёмки: ${photoData.date}`;
+  modalPhotographer.innerHTML = `<i class="fa-regular fa-user me-2"></i> Фотограф: ${photoData.photographer}`;
+  modalEmail.innerHTML = `<i class="fa-regular fa-envelope me-2"></i> Email: ${photoData.email}`;
 
   modal.classList.add('active');
-  document.body.style.overflow = 'hidden';
+  document.body.classList.add('modal-open');
 }
 
-// Закрытие модального окна
 function closeModal() {
   const modal = document.getElementById('photoModal');
   modal.classList.remove('active');
-  document.body.style.overflow = '';
+  document.body.classList.remove('modal-open');
 }
 
-// Навигация между страницами
 function navigate(pageId) {
   const sections = document.querySelectorAll('section');
-  sections.forEach(section => section.classList.add('hidden'));
+  sections.forEach(section => section.classList.add('d-none'));
   const activeSection = document.getElementById(pageId);
-  if (activeSection) activeSection.classList.remove('hidden');
+  if (activeSection) activeSection.classList.remove('d-none');
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Отправка формы заказа
 function submitForm(e) {
   e.preventDefault();
-  const name = document.getElementById('clientName')?.value || '';
-  const email = document.getElementById('clientEmail')?.value || '';
+  const name = document.getElementById('clientName')?.value.trim();
+  const email = document.getElementById('clientEmail')?.value.trim();
   if (!name || !email) {
     alert('Пожалуйста, заполните имя и email');
     return;
@@ -139,36 +133,23 @@ function submitForm(e) {
   navigate('main');
 }
 
-// Обработчик поиска
 function handleSearchInput(e) {
   currentFilter = e.target.value;
   renderGalleryWithFilter();
 }
 
-// Инициализация после загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
-  // Рендерим галерею
   renderGalleryWithFilter();
-
-  // Вешаем обработчик на поле поиска
   const searchInput = document.getElementById('searchInput');
-  if (searchInput) {
-    searchInput.addEventListener('input', handleSearchInput);
-  }
-
-  // Закрытие модального окна по клику на фон
-  const modal = document.getElementById('photoModal');
-  if (modal) {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeModal();
+  if (searchInput) searchInput.addEventListener('input', handleSearchInput);
+  const modalOverlay = document.getElementById('photoModal');
+  if (modalOverlay) {
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
     });
   }
-
-  // Закрытие по Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeModal();
   });
-
-  // Показываем главную страницу по умолчанию
   navigate('main');
 });
