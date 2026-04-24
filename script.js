@@ -172,7 +172,9 @@ function submitForm(e) {
   const name = document.getElementById('clientName')?.value.trim();
   const email = document.getElementById('clientEmail')?.value.trim();
   const message = document.getElementById('clientMessage')?.value.trim();
-
+  
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
   // Вывод данных формы в консоль
   console.log('=== Данные формы ===');
   console.log('Имя:', name);
@@ -180,7 +182,7 @@ function submitForm(e) {
   console.log('Сообщение:', message || '(не заполнено)');
   console.log('===================');
 
-  if (!name || !email) {
+  if (!name || !email || !emailPattern.test(email)) {
     // Показываем модальное окно с ошибкой
     if (errorModal) errorModal.show();
     return;
